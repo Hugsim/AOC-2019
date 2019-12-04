@@ -14,17 +14,26 @@ def hasTwoAdjacentDigitsSame(password: str) -> bool:
     result = []
     for i in range(1, len(password)):
         if (password[i - 1] == password[i]):
-            result.append(i)
+            result.append(i-1)
+
+    # Optimization
+    if len(result) == 0:
+        return False
+    elif len(result) == 1:
+        return True
+
+    # Remove sequences of numbers increasing in 1
+    for i in range(len(result)-1, 0, -1):
+        if (result[i] - result[i-1]) == 1:
+            del result[i]
+
+    for i in result:
+        try:
+            if password[i] != password[i+2]:
+                return True
+        except IndexError:
             return True
 
-    # for i in result:
-    #     try:
-    #         if password[i] != password[i+2]:
-    #             return True
-    #     except e:
-    #         print(password, i)
-    #     # except IndexError:
-    #         # return True
     return False
 
 
