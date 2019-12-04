@@ -1,11 +1,11 @@
 from lib import *
+import typing
 
-
-def pointPlus(p1, p2):
+def pointPlus(p1: (int, int), p2: (int, int)) -> (int, int):
     return (p1[0] + p2[0], p1[1] + p2[1])
 
 
-def loopThroughListAndAddPositions(dirs):
+def loopThroughListAndAddPositions(dirs: [(str, int)]) -> [(int, int)]:
     resList = [(0, 0)]
     curPoint = (0, 0)
     for (direction, amount) in dirs:
@@ -33,7 +33,7 @@ def loopThroughListAndAddPositions(dirs):
     return resList
 
 
-def manhattanDistanceFromCentre(p):
+def manhattanDistanceFromCentre(p: (int, int)) -> int:
     return abs(p[0]) + abs(p[1])
 
 
