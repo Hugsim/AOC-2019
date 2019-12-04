@@ -19,7 +19,7 @@ def toList(l: Any) -> [Any]:
     return list(l)
 
 
-def mapList(f: Callable[Any], l: [Any]) -> [Any]:
+def mapList(f: Callable[[Any], Any], l: [Any]) -> [Any]:
     return list(map(f, l))
 
 
