@@ -1,4 +1,4 @@
-import typing
+from typing import Any, Callable
 
 
 def fileIntoArray(fileName: str) -> [str]:
@@ -11,26 +11,26 @@ def fileIntoIntArray(fileName: str) -> [int]:
         return map(lambda x: int(x), f.readlines())
 
 
-def toInt(x) -> int:
+def toInt(x: Any) -> int:
     return int(x)
 
 
-def toList(l):
+def toList(l: Any) -> [Any]:
     return list(l)
 
 
-def mapList(f, l):
+def mapList(f: Callable[Any], l: [Any]) -> [Any]:
     return list(map(f, l))
 
 
-def pr(x):
+def pr(x: Any) -> Any:
     print(x)
     return x
 
 
-def fst(p):
+def fst(p: (Any, Any)) -> Any:
     return p[0]
 
 
-def snd(p):
+def snd(p: (Any, Any)) -> Any:
     return p[1]
