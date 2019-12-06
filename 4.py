@@ -11,7 +11,7 @@ def isInRange(password: str) -> bool:
 
 
 def hasTwoAdjacentDigitsSame(password: str) -> bool:
-    result = []
+    result: [int] = []
     for i in range(1, len(password)):
         if (password[i - 1] == password[i]):
             result.append(i-1)
