@@ -22,7 +22,7 @@ def hasTwoAdjacentDigitsSame(password: str) -> bool:
     elif len(result) == 1:
         return True
 
-    # Remove sequences of numbers increasing in 1
+    # Remove sequences of numbers increasing by 1
     for i in range(len(result)-1, 0, -1):
         if (result[i] - result[i-1]) == 1:
             del result[i]
