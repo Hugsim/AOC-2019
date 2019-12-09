@@ -34,3 +34,11 @@ def fst(p: (Any, Any)) -> Any:
 
 def snd(p: (Any, Any)) -> Any:
     return p[1]
+
+
+def nthDigitOfInt(n: int, num: int) -> int:
+    return int(str(num)[n])
+
+
+def sliceDigitsOfInt(start: int, end: int, num: int) -> int:
+    return int(str(num)[start:end])
