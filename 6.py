@@ -1,6 +1,10 @@
 import typing
 from lib import *
 
+# Guesses:
+# 1714 too low
+# 3023 too low
+
 
 class Node:
     def __init__(self, name: str):
