@@ -1,5 +1,7 @@
 from typing import Any
 from lib import *
+import itertools
+from more_itertools import take
 
 
 def printIf(val: Any, predicate: bool):
@@ -12,11 +14,13 @@ def getOpcodeModes(numOpcodes: int, fullOpcode: int) -> [int]:
     return mapList(toInt, paddedNumber[0:numOpcodes])[::-1]
 
 
-def evalProgram(program: [int], inputs: [int], debug: bool = False):
+def evalProgram(program: [int], inputs: [int] = [], debug: bool = False):
+    program = list(itertools.chain(
+        program, take(1000000, itertools.repeat(0))))
     PC = 0
     IC = 0
+    RB = 0
     output: [int] = []
-    print(inputs)
     while True:
         fullInst = program[PC]
         inst = int(str(fullInst)[-2:])
@@ -37,20 +41,30 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 printIf(f"Got 1st value {val1} from address {args[0]}", debug)
             elif opcodeModes[0] == 1:
                 val1 = args[0]
+            elif opcodeModes[0] == 2:
+                val1 = program[args[0] + RB]
+                printIf(
+                    f"Got 1st value {val1} from address {args[0] + RB} via RB", debug)
 
             if opcodeModes[1] == 0:
                 val2 = program[args[1]]
                 printIf(f"Got 2nd value {val2} from address {args[1]}", debug)
             elif opcodeModes[1] == 1:
                 val2 = args[1]
+            elif opcodeModes[1] == 2:
+                val2 = program[args[1] + RB]
+                printIf(
+                    f"Got 2nd value {val2} from address {args[1] + RB} via RB", debug)
 
             if opcodeModes[2] == 0:
                 dest = args[2]
             elif opcodeModes[2] == 1:
                 printIf(f'This should never happen! PC={PC}', debug)
                 break
+            elif opcodeModes[2] == 2:
+                dest = args[2] + RB
 
-            printIf(f"Adding together {val1} and {val2}.", debug)
+            printIf(f"Adding together {val1} and {val2}", debug)
             printIf(f"Writing {val1 + val2} to address {dest}", debug)
             program[dest] = val1 + val2
             PC += 4
@@ -69,18 +83,29 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 printIf(f"Got 1st value {val1} from address {args[0]}", debug)
             elif opcodeModes[0] == 1:
                 val1 = args[0]
+            elif opcodeModes[0] == 2:
+                val1 = program[args[0] + RB]
+                printIf(
+                    f"Got 1st value {val1} from address {args[0] + RB} via RB", debug)
 
             if opcodeModes[1] == 0:
                 val2 = program[args[1]]
                 printIf(f"Got 2nd value {val2} from address {args[1]}", debug)
             elif opcodeModes[1] == 1:
                 val2 = args[1]
+            elif opcodeModes[1] == 2:
+                val2 = program[args[1] + RB]
+                printIf(
+                    f"Got 2nd value {val2} from address {args[1] + RB} via RB", debug)
 
             if opcodeModes[2] == 0:
                 dest = args[2]
             elif opcodeModes[2] == 1:
                 printIf(f'This should never happen! PC={PC}', debug)
                 break
+            elif opcodeModes[2] == 2:
+                dest = args[2] + RB
+
             printIf(f"Writing {val1 * val2} to address {dest}", debug)
             program[dest] = val1 * val2
             PC += 4
@@ -97,12 +122,18 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 IC += 1
             else:
                 userInput = int(input(f'Input requested when PC={PC}: '))
+
             if opcodeModes[0] == 0:
                 printIf(f"Writing {userInput} to address {arg}", debug)
                 program[arg] = userInput
+            elif opcodeModes[0] == 2:
+                printIf(
+                    f"Writing {userInput} to address {arg + RB} via RB.", debug)
+                program[arg + RB] = userInput
             else:
                 printIf(f'This should never happen! PC={PC}', debug)
                 break
+
             PC += 2
 
         elif inst == 4:
@@ -110,12 +141,18 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
             toprint = -1337
             arg = program[PC+1]
             mode = getOpcodeModes(1, fullInst)[0]
+
             if mode == 0:
                 printIf(f"Outputting value at adress {arg}.", debug)
                 toprint = program[arg]
             elif mode == 1:
                 printIf(f"Outputting immediate value {arg}.", debug)
                 toprint = arg
+            elif mode == 2:
+                printIf(
+                    f"Outputting value at adress {arg + RB} via RB.", debug)
+                toprint = program[arg + RB]
+
             output.append(toprint)
             printIf(f'Output at PC={PC}: {toprint}', debug)
             PC += 2
@@ -129,6 +166,8 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 jumpTarget = program[args[1]]
             elif opcodeModes[1] == 1:
                 jumpTarget = args[1]
+            elif opcodeModes[1] == 2:
+                jumpTarget = program[args[1] + RB]
 
             if opcodeModes[0] == 0:
                 if program[args[0]] != 0:
@@ -149,6 +188,15 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 else:
                     printIf(
                         f"Value at address {args[0]} was 0. Not jumping.", debug)
+            elif opcodeModes[0] == 2:
+                if program[args[0] + RB] != 0:
+                    printIf(
+                        f"Value at address (via RB) {args[0] + RB} was {program[args[0] + RB]}, not 0. Jumping to {jumpTarget}.", debug)
+                    PC = jumpTarget
+                    continue
+                else:
+                    printIf(
+                        f"Value at address (via RB) {args[0] + RB} was 0. Not jumping.", debug)
 
             PC += 3
 
@@ -161,6 +209,8 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 jumpTarget = program[arg[1]]
             elif opcodeModes[1] == 1:
                 jumpTarget = arg[1]
+            elif opcodeModes[1] == 2:
+                jumpTarget = program[arg[1] + RB]
 
             if opcodeModes[0] == 0:
                 if program[arg[0]] == 0:
@@ -180,6 +230,15 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 else:
                     printIf(
                         f"Value at address {arg[0]} was not 0. Not jumping.", debug)
+            elif opcodeModes[0] == 2:
+                if program[arg[0] + RB] == 0:
+                    printIf(
+                        f"Value at address (via RB) {arg[0] + RB} was 0. Jumping to {jumpTarget}.", debug)
+                    PC = jumpTarget
+                    continue
+                else:
+                    printIf(
+                        f"Value at address (via RB) {arg[0] + RB} was {program[arg[0] + RB]}, not 0. Not jumping.", debug)
 
             PC += 3
 
@@ -197,18 +256,28 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 printIf(f"Got 1st value {val1} from address {args[0]}", debug)
             elif opcodeModes[0] == 1:
                 val1 = args[0]
+            elif opcodeModes[0] == 2:
+                val1 = program[args[0] + RB]
+                printIf(
+                    f"Got 1st value {val1} from address {args[0] + RB} via RB", debug)
 
             if opcodeModes[1] == 0:
                 val2 = program[args[1]]
                 printIf(f"Got 2nd value {val2} from address {args[1]}", debug)
             elif opcodeModes[1] == 1:
                 val2 = args[1]
+            elif opcodeModes[1] == 2:
+                val2 = program[args[1] + RB]
+                printIf(
+                    f"Got 2nd value {val2} from address {args[1] + RB} via RB", debug)
 
             if opcodeModes[2] == 0:
                 dest = args[2]
             elif opcodeModes[2] == 1:
                 printIf(f'This should never happen! PC={PC}', debug)
                 break
+            elif opcodeModes[2] == 2:
+                dest = args[2] + RB
 
             program[dest] = 1 if val1 < val2 else 0
             PC += 4
@@ -227,21 +296,49 @@ def evalProgram(program: [int], inputs: [int], debug: bool = False):
                 printIf(f"Got 1st value {val1} from address {args[0]}", debug)
             elif opcodeModes[0] == 1:
                 val1 = args[0]
+            elif opcodeModes[0] == 2:
+                val1 = program[args[0] + RB]
+                printIf(
+                    f"Got 1st value {val1} from address {args[0]} via RB", debug)
 
             if opcodeModes[1] == 0:
                 val2 = program[args[1]]
                 printIf(f"Got 2nd value {val2} from address {args[1]}", debug)
             elif opcodeModes[1] == 1:
                 val2 = args[1]
+            elif opcodeModes[1] == 2:
+                val2 = program[args[1] + RB]
+                printIf(
+                    f"Got 2nd value {val2} from address {args[1] + RB} via RB", debug)
 
             if opcodeModes[2] == 0:
                 dest = args[2]
             elif opcodeModes[2] == 1:
                 printIf(f'This should never happen! PC={PC}', debug)
                 break
+            elif opcodeModes[2] == 2:
+                dest = args[2] + RB
 
             program[dest] = 1 if val1 == val2 else 0
             PC += 4
+
+        elif inst == 9:
+            printIf("ARB", debug)
+            val = -1337
+            args = program[PC+1:PC+2]
+            opcodeModes = getOpcodeModes(1, fullInst)
+            printIf(f"opcodeModes={opcodeModes}, arguments={args}", debug)
+
+            if opcodeModes[0] == 0:
+                val = program[args[0]]
+                printIf(f"Got value {val1} from address {args[0]}", debug)
+            elif opcodeModes[0] == 1:
+                val = args[0]
+            elif opcodeModes[0] == 2:
+                val = program[args[0] + RB]
+
+            RB += val
+            PC += 2
 
         elif inst == 99:
             printIf("HLT", debug)
