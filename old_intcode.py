@@ -1,18 +1,3 @@
-from typing import Any
-from lib import *
-
-
-class IntcodeComputer:
-    def __init__(self, program, inputs=None):
-        self.program = program + ([0] * 1_000_000)
-        self.inputs = [] if inputs is None else inputs
-
-    def runUntilOutput(self, inputs=[], debug=False):
-        for i in inputs:
-            self.inputs.append(i)
-        return evalProgramUntilOutput(self.program, self.inputs, debug)
-
-
 def printIf(val: Any, predicate: bool):
     if predicate:
         print(val)
@@ -23,15 +8,13 @@ def getOpcodeModes(numOpcodes: int, fullOpcode: int) -> [int]:
     return mapList(toInt, paddedNumber[0:numOpcodes])[::-1]
 
 
-PC = 0
-IC = 0
-RB = 0
-
-
-def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = False):
-    global PC
-    global IC
-    global RB
+def evalProgram(program: [int], inputs: [int] = [], debug: bool = False):
+    program = list(itertools.chain(
+        program, take(1_000_000, itertools.repeat(0))))
+    PC = 0
+    IC = 0
+    RB = 0
+    output: [int] = []
     while True:
         fullInst = program[PC]
         inst = int(str(fullInst)[-2:])
@@ -164,9 +147,9 @@ def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = Fal
                     f"Outputting value at adress {arg + RB} via RB.", debug)
                 toprint = program[arg + RB]
 
+            output.append(toprint)
             printIf(f'Output at PC={PC}: {toprint}', debug)
             PC += 2
-            return toprint
 
         elif inst == 5:
             printIf("JNZ", debug)
@@ -354,9 +337,10 @@ def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = Fal
         elif inst == 99:
             printIf("HLT", debug)
             printIf(f'Program halted when PC={PC}', debug)
-            return
+            return output
 
         else:
             printIf(
                 f"Trying to do an illegal operation: {inst} at PC={PC}.", debug)
+            printIf(f"Was going to output {output}.", debug)
             break

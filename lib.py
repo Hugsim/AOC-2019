@@ -27,6 +27,11 @@ def mapList(f: Callable[[Any], Any], l: [Any]) -> [Any]:
     return list(map(f, l))
 
 
+maplist = mapList
+listmap = mapList
+listMap = mapList
+
+
 def pr(x: Any) -> Any:
     print(x)
     return x
