@@ -14,6 +14,9 @@ def fileIntoIntArray(fileName: str) -> [int]:
 def toInt(x: Any) -> int:
     return int(x)
 
+def toFloat(x: Any) -> float:
+    return float(x)
+
 
 def toList(l: Any) -> [Any]:
     return list(l)
