@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 
 
 def fileIntoArray(fileName: str) -> [str]:
@@ -32,11 +32,11 @@ def pr(x: Any) -> Any:
     return x
 
 
-def fst(p: (Any, Any)) -> Any:
+def fst(p: Tuple[Any, Any]) -> Any:
     return p[0]
 
 
-def snd(p: (Any, Any)) -> Any:
+def snd(p: Tuple[Any, Any]) -> Any:
     return p[1]
 
 
