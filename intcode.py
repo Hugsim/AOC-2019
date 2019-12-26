@@ -3,14 +3,17 @@ from lib import *
 
 
 class IntcodeComputer:
-    def __init__(self, program, inputs=None):
+    def __init__(self, program, inputs=[]):
         self.program = program + ([0] * 1_000_000)
-        self.inputs = [] if inputs is None else inputs
+        self.inputs = inputs
 
-    def runUntilOutput(self, inputs=[], debug=False):
+    def runUntilOutput(self, inputs=[], debug=False, auto=False):
         for i in inputs:
             self.inputs.append(i)
-        return evalProgramUntilOutput(self.program, self.inputs, debug)
+        return evalProgramUntilOutput(self.program, self.inputs, debug, auto)
+
+    def addInput(self, inp):
+        self.inputs.append(inp)
 
 
 def printIf(val: Any, predicate: bool):
@@ -28,7 +31,7 @@ IC = 0
 RB = 0
 
 
-def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = False):
+def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = False, auto: bool = False):
     global PC
     global IC
     global RB
@@ -132,7 +135,10 @@ def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = Fal
                     f"Inputting {userInput} automatically when PC={PC}", debug)
                 IC += 1
             else:
-                userInput = int(input(f'Input requested when PC={PC}: '))
+                if auto:
+                    return "INP"
+                else:
+                    userInput = int(input(f'Input requested when PC={PC}: '))
 
             if opcodeModes[0] == 0:
                 printIf(f"Writing {userInput} to address {arg}", debug)
@@ -354,7 +360,7 @@ def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = Fal
         elif inst == 99:
             printIf("HLT", debug)
             printIf(f'Program halted when PC={PC}', debug)
-            return
+            return "HLT"
 
         else:
             printIf(

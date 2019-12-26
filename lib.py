@@ -48,9 +48,24 @@ def snd(p: Tuple[Any, Any]) -> Any:
     return p[1]
 
 
+def trd(p: Tuple[Any, Any, Any]) -> Any:
+    return p[2]
+
+
 def nthDigitOfInt(n: int, num: int) -> int:
     return int(str(num)[n])
 
 
 def sliceDigitsOfInt(start: int, end: int, num: int) -> int:
     return int(str(num)[start:end])
+
+def find(arr: [Any], elem: Any) -> int:
+    for i in range(len(arr)):
+        if arr[i] == elem:
+            return i
+
+def find2d(arr: [[Any]], elem: Any) -> Tuple[int, int]:
+    for i in range(len(arr)):
+        for j in range(len(arr[i])):
+            if arr[i][j] == elem:
+                return (i, j)
