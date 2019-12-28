@@ -12,8 +12,29 @@ class IntcodeComputer:
             self.inputs.append(i)
         return evalProgramUntilOutput(self.program, self.inputs, debug, auto)
 
+    def runUntilInput(self, inputs=[], debug=False, auto=True):
+        for i in inputs:
+            self.inputs.append(i)
+        
+        output = []
+        while res := evalProgramUntilOutput(self.program, self.inputs, debug, auto):
+            if res == "HLT":
+                return output
+            elif res == "INP":
+                return output
+            else:
+                output.append(res)
+                continue
+
     def addInput(self, inp):
         self.inputs.append(inp)
+
+def asciiPrint(arr):
+    for elem in arr:
+        if elem > 0xff:
+            print(f"Non-ascii found: {elem}")
+        else:
+            print(chr(elem), end="")
 
 
 def printIf(val: Any, predicate: bool):
@@ -136,6 +157,7 @@ def evalProgramUntilOutput(program: [int], inputs: [int] = [], debug: bool = Fal
                 IC += 1
             else:
                 if auto:
+                    printIf(f"Auto-input at PC={PC}", debug)
                     return "INP"
                 else:
                     userInput = int(input(f'Input requested when PC={PC}: '))

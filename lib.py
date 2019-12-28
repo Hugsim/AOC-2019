@@ -8,8 +8,10 @@ def fileIntoArray(fileName: str) -> [str]:
 
 def fileIntoIntArray(fileName: str) -> [int]:
     with open(fileName) as f:
-        return map(toInt, f.readlines())
+        return mapList(toInt, f.readlines())
 
+def toChr(x: Any) -> str:
+    return chr(x)
 
 def toInt(x: Any) -> int:
     return int(x)
